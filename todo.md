@@ -1,3 +1,3 @@
-Still have to do GamePannle.java 
+look in GamePanle.java
 
-Also Settings.java
+Also Settings.javaS
