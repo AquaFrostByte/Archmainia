@@ -15,5 +15,7 @@ The game loop is mainly a simple rythem game that also has been seen in Osu! Man
 
 to run the game just do 
 ``` bash
-java Archmania.java
+java Main.java
 ```
+
+THere is a https://archmania.lain.onl/manual (Well if i get to it :p)
