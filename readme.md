@@ -10,3 +10,10 @@ I defently want to add an Leaderboard, Custom Levels, Osu converter and since i 
 ## Basic gameloop
 
 The game loop is mainly a simple rythem game that also has been seen in Osu! Mania or Fortnite festival but mine is in java!! (which makes it worse probably x33)
+
+## Running the game
+
+to run the game just do 
+``` bash
+java Archmania.java
+```
