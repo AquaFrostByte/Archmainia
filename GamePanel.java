@@ -232,6 +232,71 @@ public class GamePanel extends JPanel {
             }
         }
     }
+
+
+    private void setupKeys() {
+        bindKey("D", 0);
+        bindKey("F", 1);
+        bindKey("H", 2);
+        bindKey("J", 3);
+        this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("ESCAPE"), "pause");
+        this.getActionMap().put("pause", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!isGameOver) {
+                    togglePause();
+                }
+            }
+        });
+    }
+
+    private void togglePause() {
+        isPaused = !isPaused;
+        if (isPaused) {
+            audioManager.pause();
+            resumeBtn.setVisible(true);
+            pauseMenuBtn.setVisible(true);
+        } else {
+            audioManager.resume();
+            resumeBtn.setVisible(false);
+            pauseMenuBtn.setVisible(false);
+            this.requestFocusInWindow();
+        }
+    }
+
+  //add keybinding
+
+    private void checkHitPress(int lane) {
+        double songTime = audioManager.getCurrentTimeSeconds();
+        for (Note note : notes) {
+            if (note.active && note.lane == lane && !note.isBeingHeld) {
+                double error = Math.abs(note.hitTime - songTime);
+                if (error < 0.15) {
+                    score += 50;
+                    if (note.duration == 0) {
+                        note.active = false;
+                        score += 50;
+                    } else {
+                        note.isBeingHeld = true;
+                    }
+                    return;
+                }
+            }
+        }
+    }
+
+    private void checkHitRelease(int lane) {
+        double songTime = audioManager.getCurrentTimeSeconds();
+        for (Note note : notes) {
+            if (note.active && note.lane == lane && note.isBeingHeld) {
+                note.isBeingHeld = false;
+                double releaseError = Math.abs(note.getEndTime() - songTime);
+                if (releaseError < 0.20) {
+                    score += 50;
+                    note.active = false;
+                }
+                return;
+            }
+        }
+    }
 }
-//add keysetup pause and note hit check
-// add the controll stuff
