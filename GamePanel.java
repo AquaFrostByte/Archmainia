@@ -172,7 +172,66 @@ public class GamePanel extends JPanel {
         playAgainBtn.setVisible(true);
         menuBtn.setVisible(true);
     }
-}
 
-// Set up the Ui for the playing feeld TLDR
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        int laneWidth = getWidth() / 4;
+        double songTime = audioManager.getCurrentTimeSeconds();
+
+        String[] keyNames = {"Dd", "F", "H", "J"};
+        for (int i = 0; i < 4; i++) { //mabey i will up it to 5 lines instad of 4
+            Color laneColor = laneColors[i];
+            g2d.setColor(new Color(laneColor.getRed(), laneColor.getGreen(), laneColor.getBlue(), 30));
+            g2d.fillRect(i * laneWidth, 0, laneWidth, getHeight());
+
+            g2d.setColor(Color.DARK_GRAY);
+            g2d.drawLine(i * laneWidth, 0, i * laneWidth, getHeight());
+
+            g2d.setColor(laneColor);
+            g2d.setFont(new Font("Arial", Font.BOLD, 20));
+            g2d.drawString(keyNames[i], i * laneWidth + (laneWidth/2) - 5, JUDGMENT_Y + 30);
+        }
+
+        g2d.setColor(Color.WHITE);
+        g2d.setStroke(new BasicStroke(3));
+        g2d.drawLine(0, JUDGMENT_Y, getWidth(), JUDGMENT_Y);
+
+        g2d.setColor(Color.WHITE);
+        g2d.setFont(new Font("Arial", Font.BOLD, 20));
+        g2d.drawString("Score: " + score, 10, 30);
+
+        if (isGameOver) {
+            g2d.setFont(new Font("Arial", Font.BOLD, 40));
+            g2d.setColor(Color.YELLOW);
+            g2d.drawString("GRADE: " + finalGrade, 140, 200);
+            return;
+        }
+
+        for (Note note : notes) {
+            if (note.active) {
+                int bottomY = JUDGMENT_Y - (int)((note.hitTime - songTime) * SCROLL_SPEED);
+                int height = (note.duration > 0) ? (int)(note.duration * SCROLL_SPEED) : 30;
+                int topY = bottomY - height;
+
+                if (bottomY > -50 && topY < getHeight() + 50) {
+                    if (note.isBeingHeld) {
+                        g2d.setColor(Color.WHITE);
+                    } else {
+                        g2d.setColor(laneColors[note.lane]);
+                    }
+                    g2d.fillRect(note.lane * laneWidth + 10, topY, laneWidth - 20, height);
+                }
+
+                if (!note.isBeingHeld && songTime > note.getEndTime() + 0.2) {
+                    note.active = false;
+                }
+            }
+        }
+    }
+}
+//add keysetup pause and note hit check
 // add the controll stuff
