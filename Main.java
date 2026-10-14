@@ -17,6 +17,8 @@ public class Main {
 
         frame.setLocationRelativeTo(null);
 
+        UIConfig.updateForResolution(saveSystem.resWidth, saveSystem.resHeight);
+
         showMenu();
 
         frame.setUndecorated(true);

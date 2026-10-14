@@ -11,7 +11,7 @@ public class MenuPanel extends JPanel {
 
     public MenuPanel() {
         try {
-            backgroundImage = ImageIO.read(new File("background.png"));
+            backgroundImage = ImageIO.read(new File("img/background.png"));
         } catch (IOException e) {
             System.err.println("Could not load background image: " + e.getMessage());
         }
@@ -44,7 +44,7 @@ public class MenuPanel extends JPanel {
                     levelCount++;
                     String levelName = folder.getName();
                     int score = Main.saveSystem.getHighScore(levelName);
-                    String grade = Main.saveSystem.getGrade(levelNa);
+                    String grade = Main.saveSystem.getGrade(levelName);
                     JButton btn = new JButton(levelName + "  |  Best: " + score + " [" + grade + "]");
                     
                     btn.setFont(UIConfig.LEVEL_BTN_FONT);
@@ -104,7 +104,6 @@ public class MenuPanel extends JPanel {
         exitBtn.addActionListener(e -> System.exit(0));
 
         this.add(exitBtn);
-    
     }
 
     @Override

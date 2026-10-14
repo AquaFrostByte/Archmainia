@@ -264,7 +264,26 @@ public class GamePanel extends JPanel {
         }
     }
 
-  //add keybinding
+    private void bindKey(String key, int lane) {
+        InputMap inputMap = this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap actionMap = this.getActionMap();
+
+        inputMap.put(KeyStroke.getKeyStroke("pressed " + key), key + "Press");
+        actionMap.put(key + "Press", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!isGameOver) checkHitPress(lane);
+            }
+        });
+
+        inputMap.put(KeyStroke.getKeyStroke("released " + key), key + "Release");
+        actionMap.put(key + "Release", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!isGameOver) checkHitRelease(lane);
+            }
+        });
+    }
 
     private void checkHitPress(int lane) {
         double songTime = audioManager.getCurrentTimeSeconds();

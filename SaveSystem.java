@@ -5,7 +5,8 @@ public class SaveSystem {
     private final String FILE_NAME = "save_data.txt";
     private HashMap<String, String> levelRecords = new HashMap<>();
 
-    public String username = "Player1"; //Still have to do a real settings OptionSSS    public int volume = 80;
+    public String username = "Player1"; //Still have to do a real settings Option
+    public int volume = 80;
     public int resWidth = 951;
     public int resHeight = 1247;
     public int judgmentY = 1050;
