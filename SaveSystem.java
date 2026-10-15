@@ -11,8 +11,11 @@ public class SaveSystem {
     public int resHeight = 1247;
     public int judgmentY = 1050;
 
+    private final String CONFIG_NAME = "config.txt";
+
     public SaveSystem() {
         loadScores();
+        loadConfig();
     }
 
     public void loadScores() {
@@ -51,4 +54,51 @@ public class SaveSystem {
         if (!levelRecords.containsKey(level)) return "Unplayed";
         return levelRecords.get(level).split(",")[1];
     }
+
+    private void loadConfig() {
+        File configFile = new File(CONFIG_NAME);
+        
+        if (!configFile.exists()) {
+            System.out.println("No config found, creating default...");
+            saveConfig();
+            return; 
+        }
+
+        try (BufferedReader br = new BufferedReader(new FileReader(configFile))) {
+            String line;
+            
+            line = br.readLine();
+            if (line != null && !line.isEmpty()) username = line.trim();
+
+            line = br.readLine();
+            if (line != null && !line.isEmpty()) volume = Integer.parseInt(line.trim());
+
+            line = br.readLine();
+            if (line != null && !line.isEmpty()) resWidth = Integer.parseInt(line.trim());
+
+            line = br.readLine();
+            if (line != null && !line.isEmpty()) resHeight = Integer.parseInt(line.trim());
+
+            line = br.readLine();
+            if (line != null && !line.isEmpty()) judgmentY = Integer.parseInt(line.trim());
+
+            System.out.println("Config loaded successfully!");
+
+        } catch (Exception e) {
+            System.err.println("ERROR READING CONFIG FILE");
+        }
+    }
+
+    public void saveConfig() {
+        try (PrintWriter out = new PrintWriter(new FileWriter(CONFIG_NAME))) {
+            out.println(username);
+            out.println(volume);
+            out.println(resWidth);  
+            out.println(resHeight); 
+            out.println(judgmentY); 
+        } catch (Exception e) {
+            System.err.println("Could not save config!");
+        }
+    }
 }
+

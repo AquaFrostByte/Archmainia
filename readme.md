@@ -19,3 +19,7 @@ java Main.java
 ```
 
 THere is a https://archmania.lain.onl/manual (Well if i get to it :p)
+
+## Song Mentions
+
+The song you hear in the Demo is Duvet by Boa go check them out!

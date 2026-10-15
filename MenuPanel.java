@@ -104,7 +104,16 @@ public class MenuPanel extends JPanel {
         exitBtn.addActionListener(e -> System.exit(0));
 
         this.add(exitBtn);
-    }
+
+        JButton settingsBtn = new JButton("Settings");
+            settingsBtn.setFont(UIConfig.ACTION_BTN_FONT);
+            settingsBtn.setFocusPainted(false);
+            settingsBtn.setBackground(UIConfig.SETTINGS_BG);
+            settingsBtn.setForeground(UIConfig.TEXT_WHITE);
+            settingsBtn.setBounds(UIConfig.MENU_SETTINGS_X, UIConfig.MENU_SETTINGS_Y, UIConfig.ACTION_BTN_SIZE.width, UIConfig.ACTION_BTN_SIZE.height);
+            settingsBtn.addActionListener(e -> openSettingsMenu());
+            this.add(settingsBtn);
+        }
 
     @Override
     protected void paintComponent(Graphics g) {
@@ -113,4 +122,90 @@ public class MenuPanel extends JPanel {
             g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
         }
     }
+
+    private void openSettingsMenu() {
+        JDialog settingsDialog = new JDialog(Main.frame, "Settings", true);
+        settingsDialog.setSize(350, 350); 
+        settingsDialog.setLocationRelativeTo(this); 
+        settingsDialog.getContentPane().setBackground(new Color(40, 40, 40));
+        settingsDialog.setLayout(new BoxLayout(settingsDialog.getContentPane(), BoxLayout.Y_AXIS));
+
+        JLabel nameLabel = new JLabel("Username:");
+        nameLabel.setForeground(Color.WHITE);
+        nameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        JTextField nameField = new JTextField(Main.saveSystem.username, 15);
+        nameField.setMaximumSize(new Dimension(200, 30));
+        nameField.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel volLabel = new JLabel("Volume:");
+        volLabel.setForeground(Color.WHITE);
+        volLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JSlider volSlider = new JSlider(0, 100, Main.saveSystem.volume);
+        volSlider.setBackground(new Color(40, 40, 40));
+        volSlider.setForeground(Color.WHITE);
+        volSlider.setMajorTickSpacing(25);
+        volSlider.setPaintTicks(true);
+        volSlider.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel resLabel = new JLabel("Resolution:");
+        resLabel.setForeground(Color.WHITE);
+        resLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        String[] resOptions = {
+            "951 x 1247 (Original)", 
+            "760 x 998", 
+            "634 x 831", 
+            "475 x 623"
+        };
+        JComboBox<String> resDropdown = new JComboBox<>(resOptions);
+        resDropdown.setMaximumSize(new Dimension(200, 30));
+        resDropdown.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        if (Main.saveSystem.resWidth == 760) resDropdown.setSelectedIndex(1);
+        else if (Main.saveSystem.resWidth == 634) resDropdown.setSelectedIndex(2);
+        else if (Main.saveSystem.resWidth == 475) resDropdown.setSelectedIndex(3);
+        else resDropdown.setSelectedIndex(0); 
+
+        JButton saveBtn = new JButton("Save & Apply Settings");
+        saveBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        saveBtn.addActionListener(e -> {
+            Main.saveSystem.username = nameField.getText();
+            Main.saveSystem.volume = volSlider.getValue();
+            
+            int selectedRes = resDropdown.getSelectedIndex();
+            switch(selectedRes) {
+                case 0: Main.saveSystem.resWidth = 951; Main.saveSystem.resHeight = 1247; break;
+                case 1: Main.saveSystem.resWidth = 760; Main.saveSystem.resHeight = 998; break;
+                case 2: Main.saveSystem.resWidth = 634; Main.saveSystem.resHeight = 831; break;
+                case 3: Main.saveSystem.resWidth = 475; Main.saveSystem.resHeight = 623; break;
+            }
+            
+            UIConfig.updateForResolution(Main.saveSystem.resWidth, Main.saveSystem.resHeight);
+            
+            Main.frame.setSize(Main.saveSystem.resWidth, Main.saveSystem.resHeight);
+            Main.frame.setLocationRelativeTo(null); 
+            
+            Main.saveSystem.saveConfig();
+            settingsDialog.dispose();
+            Main.showMenu();
+        });
+
+        settingsDialog.add(Box.createVerticalStrut(15));
+        settingsDialog.add(nameLabel);
+        settingsDialog.add(nameField);
+        settingsDialog.add(Box.createVerticalStrut(15));
+        settingsDialog.add(volLabel);
+        settingsDialog.add(volSlider);
+        settingsDialog.add(Box.createVerticalStrut(15));
+        settingsDialog.add(resLabel);
+        settingsDialog.add(resDropdown);
+        settingsDialog.add(Box.createVerticalStrut(20));
+        settingsDialog.add(saveBtn);
+        
+        settingsDialog.setVisible(true);
+    }
 }
+
+
