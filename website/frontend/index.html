@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> - Archmania - </title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: black; /* Dark cyberpunk background */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* 1. The Outer Gradient Background */
+        .gradient-wrapper {
+            width: 95vw;
+            height: 95vh;
+            background: linear-gradient(45deg, #ff00aa, #00d4ff);
+            
+            padding: 6px; 
+            box-sizing: border-box;
+            
+            display: flex;
+            flex-direction: column;
+            gap: 6px; /* Divider thickness */
+        }
+
+        /* 2. The Inner Black Boxes */
+        .header-box, .content-box {
+            background-color: black; /* Deep rich black */
+            color: white;
+        }
+
+        /* Header Styling */
+        .header-box {
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+        }
+
+        .header-box h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            background: linear-gradient(45deg, #ff00aa, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent; /* Neon text effect */
+        }
+
+        /* Content Layout (Flexbox split: Left for text, Right for image) */
+        .content-box {
+            flex-grow: 1; 
+            padding: 40px;
+            display: flex;
+            gap: 40px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Left Side Text Styling */
+        .text-section {
+            flex: 1;
+            max-width: 55%;
+        }
+
+        .text-section h2 {
+            font-size: 2rem;
+            margin-top: 0;
+            color: #00d4ff; /* Cyber blue */
+        }
+
+        .text-section p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #b3b3cc; /* Soft gray for easier reading */
+            margin-bottom: 30px;
+        }
+
+        /* Button Container & Buttons */
+        .button-group {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            display: inline-block;
+            text-decoration: none;
+            padding: 12px 24px;
+            font-weight: bold;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #ff00aa, #00d4ff);
+            color: white;
+            border: none;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #00d4ff;
+            border: 2px solid #00d4ff;
+        }
+
+        /* Right Side Image Styling */
+        .image-section {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .image-section img {
+            max-width: 100%;
+            height: auto;
+            box-shadow: 0 0 20px rgba(255, 0, 170, 0.3); /* Neon glow effect around screenshot */
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Dropdown Styling */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: black;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0, 212, 255, 0.3);
+            z-index: 1;
+            border: 2px solid #00d4ff;
+            margin-top: 5px;
+        }
+
+        .dropdown-content a {
+            color: #00d4ff;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #00d4ff;
+            color: black;
+        }
+
+        .show { display: block; }
+
+        /* Responsive tweak for smaller screens */
+        @media (max-width: 768px) {
+            .content-box {
+                flex-direction: column;
+                text-align: center;
+                overflow-y: auto;
+            }
+            .text-section {
+                max-width: 100%;
+                margin-bottom: 20px;
+            }
+            .button-group {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="gradient-wrapper">
+        <header class="header-box">
+            <h1>Archmania</h1>
+        </header>
+        <main class="content-section">
+            <div class="text-section">
+                <h2>Archmania is a silly little rhythm game!</h2>
+                <p>
+                    There is not much to it, just click the notes and try to get the hightest scores possible!
+                    <br><br>
+                    If you are good enough, you can get featured on the Leaderboard! There are diffrent levels in the base game, although most levels should be added by the user.
+                    <br><br>
+                    But dont worry, it wont be to hard! Its made easy by justy importing Osu Maps.
+                </p>
+                <div class="button-group">
+                    <a href="/leaderboard" class="btn btn-primary">View Leaderboards</a>
+                    <div class="dropdown">
+                        <button onclick="toggleDropdown()" class="btn btn-secondary">Download</button>
+                        <div id="downloadDropdown" class="dropdown-content">
+                            <a href="" target="_blank">Windows</a>
+                            <a href="" target="_blank">Linux</a>
+                            <a href="" target="_blank">Source</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="image-section">
+                <img src="{{ url_for('static', filename='assets/image.png') }}">
+            </div>
+        </main>
+    </div>
+    <script>
+        function toggleDropdown() {
+            document.getElementById("downloadDropdown").classList.toggle("show");
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.matches('.btn-secondary')) {
+                var dropdowns = document.getElementsByClassName("dropdown-content");
+                for (var i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        }
+    </script>
+</body>
