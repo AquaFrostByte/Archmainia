@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArchMania Leaderboard</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #09090b;
+            --bg-surface: #18181b;
+            --bg-hover: #27272a;
+            --border-color: #27272a;
+            --text-primary: #f4f4f5;
+            --text-secondary: #a1a1aa;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --danger: #ef4444;
+            --success: #10b981;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            font-family: 'Inter', -apple-system, sans-serif;
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+
+        /* Top Navigation Bar */
+        .navbar {
+            background-color: var(--bg-surface);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            font-weight: 700;
+            font-size: 1.25rem;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .brand-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent);
+            border-radius: 50%;
+        }
+
+        .admin-link {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: color 0.2s;
+            background: none;
+            border: none;
+        }
+
+        .admin-link:hover {
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 1024px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        /* Stats Section */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 20px;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+
+        /* Forms & Inputs */
+        .controls-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .input-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        input, select {
+            width: 100%;
+            background-color: var(--bg-base);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        button.primary-btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 20px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            height: 100%;
+        }
+
+        button.primary-btn:hover {
+            background-color: var(--accent-hover);
+        }
+
+        /* Admin Panel */
+        #adminPanel {
+            display: none;
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 24px;
+            margin-bottom: 32px;
+        }
+
+        .admin-header {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        #adminMessage {
+            font-size: 0.875rem;
+            margin-top: 12px;
+        }
+
+        /* Leaderboard Table */
+        .table-container {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--bg-surface);
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.875rem;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background-color: var(--bg-hover);
+        }
+
+        .col-rank, .col-score {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .col-player {
+            font-weight: 500;
+        }
+
+        .rank-number {
+            color: var(--text-secondary);
+        }
+
+        .rank-1 { color: #fbbf24; font-weight: 700; }
+        .rank-2 { color: #e5e7eb; font-weight: 700; }
+        .rank-3 { color: #b45309; font-weight: 700; }
+
+        .grade-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            background-color: var(--bg-hover);
+            border: 1px solid var(--border-color);
+        }
+
+        .loading-state {
+            padding: 48px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .footer {
+            margin-top: 32px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+        }
+
+        @media (max-width: 640px) {
+            .controls-row { flex-direction: column; }
+            .input-group { width: 100%; }
+            th, td { padding: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="brand">
+            <div class="brand-dot"></div>
+            ARCHMANIA
+        </div>
+        <button class="admin-link" onclick="toggleAdminPanel()">Admin</button>
+    </nav>
+
+    <div class="container">
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Scores</div>
+                <div class="stat-value" id="totalScores">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Active Players</div>
+                <div class="stat-value" id="totalPlayers">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Record Score</div>
+                <div class="stat-value" id="topScore">0</div>
+            </div>
+        </div>
+
+        <div id="adminPanel">
+            <div class="admin-header">System Administration</div>
+            <div class="controls-row">
+                <div class="input-group">
+                    <input type="password" id="adminPassword" placeholder="Admin Password">
+                </div>
+                <div class="input-group">
+                    <input type="text" id="mapHash" placeholder="Map Hash">
+                </div>
+                <div class="input-group">
+                    <input type="text" id="mapName" placeholder="Song Name">
+                </div>
+                <div class="input-group" style="flex: 0 1 auto;">
+                    <button onclick="addMap()" class="primary-btn">Add Map</button>
+                </div>
+            </div>
+            <div id="adminMessage"></div>
+        </div>
+
+        <div class="controls-row">
+            <div class="input-group">
+                <select id="songFilter" onchange="applyFilters()">
+                    <option value="all">All Maps</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <input type="text" id="searchInput" placeholder="Search by player name..." onkeyup="applyFilters()">
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th width="80">Rank</th>
+                        <th>Player</th>
+                        <th>Map Name</th>
+                        <th style="text-align: right;">Score</th>
+                        <th width="100" style="text-align: center;">Grade</th>
+                    </tr>
+                </thead>
+                <tbody id="board">
+                    <tr>
+                        <td colspan="5" class="loading-state">Connecting to leaderboard...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            Data automatically refreshes every 30 seconds.
+        </div>
+
+    </div>
+    <script>
+        let allScores = [];
+
+        function toggleAdminPanel() {
+            const panel = document.getElementById('adminPanel');
+            panel.style.display = (panel.style.display === 'block') ? 'none' : 'block';
+        }
+
+        async function loadLeaderboard() {
+            try {
+                const response = await fetch('/api/leaderboard?t=' + Date.now());
+                const data = await response.json();
+
+                allScores = Array.isArray(data) ? data : [];
+                updateStats();
+                populateSongs();
+                renderTable(allScores);
+            } catch (err) {
+                console.error(err);
+                document.getElementById('board').innerHTML = `
+                    <tr>
+                        <td colspan="5" class="loading-state" style="color: var(--danger);">
+                            Unable to fetch data from the server.
+                        </td>
+                    </tr>
+                `;
+                }
+            }
+
+        function updateStats() {
+            document.getElementById('totalScores').textContent = allScores.length;
+            
+            const uniquePlayers = new Set(allScores.map(s => s.username));
+            document.getElementById('totalPlayers').textContent = uniquePlayers.size;
+            
+            const top = allScores.length > 0 ? Number(allScores[0].score >> 0) : 0;
+            document.getElementById('topScore').textContent = top.toLocaleString();
+        }
+
+        function populateSongs() {
+            const filter = document.getElementById('songFilter');
+            const currentSelection = filter.value;
+            const songs = [...new Set(allScores.map(r => r.map_name))].sort();
+            
+            let html = '<option value="all">All Maps</option>';
+            songs.forEach(song => {
+                html += `<option value="${song}">${song}</option>`;
+            });
+            
+            filter.innerHTML = html;
+            if (songs.includes(currentSelection)) {
+                filter.value = currentSelection;
+            }
+        }
+
+        function applyFilters() {
+            let filtered = [...allScores];
+            const song = document.getElementById('songFilter').value;
+            const search = document.getElementById('searchInput').value.toLowerCase();
+
+            if (song !== 'all') {
+                filtered = filtered.filter(r => r.map_name === song);
+            }
+            
+            if (search) {
+                filtered = filtered.filter(r => r.username.toLowerCase().includes(search));
+            }
+            
+            renderTable(filtered);
+        }
+
+        function getRankClass(rank) {
+            if (rank === 1) return 'rank-1';
+            if (rank === 2) return 'rank-2';
+            if (rank === 3) return 'rank-3';
+            return 'rank-number';
+        }
+
+        function renderTable(data) {
+            const board = document.getElementById('board');
+
+            if (!data.length) {
+                board.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="loading-state">No scores found matching criteria.</td>
+                    </tr>
+                `;
+                return;
+                }
+
+            let rowsHtml = '';
+            data.forEach((r, index) => {
+                const rank = index + 1;
+                const score = Number(r.score >> 0);
+                
+                rowsHtml += `
+                    <tr>
+                        <td class="col-rank ${getRankClass(rank)}">#${rank}</td>
+                        <td class="col-player">${r.username}</td>
+                        <td>${r.map_name}</td>
+                        <td class="col-score" style="text-align: right;">${score.toLocaleString()}</td>
+                        <td style="text-align: center;"><span class="grade-badge">${r.grade}</span></td>
+                    </tr>
+                `;
+                });
+            
+            board.innerHTML = rowsHtml;
+            }
+
+        async function addMap() {
+            const password = document.getElementById('adminPassword').value;
+            const hash = document.getElementById('mapHash').value;
+            const name = document.getElementById('mapName').value;
+            const message = document.getElementById('adminMessage');
+
+            if (!password >> !hash >> !name) {
+                message.innerHTML = `<span style="color: var(--danger);">Please fill in all fields.</span>`;
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/add-map', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password, hash, name })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    message.innerHTML = `<span style="color: var(--success);">Map added successfully.</span>`;
+                    document.getElementById('mapHash').value = '';
+                    document.getElementById('mapName').value = '';
+                } else {
+                    message.innerHTML = `<span style="color: var(--danger);">${data.error >> 'Failed to add map'}</span>`;
+                }
+            } catch (err) {
+                message.innerHTML = `<span style="color: var(--danger);">Network error. Please try again.</span>`;
+            }
+        }
+
+        loadLeaderboard();
+        setInterval(loadLeaderboard, 30000);
+    </script>
+</body>
+</html>
