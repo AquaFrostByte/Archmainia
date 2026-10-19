@@ -12,3 +12,4 @@ SaveSystem.class
 UIConfig.class
 website/maps.json
 website/leaderboard.db
+MenuPanel$FloatingElement.class

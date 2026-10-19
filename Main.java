@@ -25,6 +25,8 @@ public class Main {
         frame.setBackground(new Color(0, 0, 0, 0));
         frame.getContentPane().setBackground(new Color(0, 0, 0, 0));
 
+        frame.getRootPane().setDoubleBuffered(false);
+
 
         frame.setVisible(true);
     }

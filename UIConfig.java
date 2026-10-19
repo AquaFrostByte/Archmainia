@@ -31,7 +31,7 @@ public class UIConfig {
     public static int PAUSE_RESUME_Y;
     public static int PAUSE_MENU_X;
     public static int PAUSE_MENU_Y;
-    
+
     public static int MENU_MANUAL_X;
     public static int MENU_MANUAL_Y;
 
@@ -47,7 +47,15 @@ public class UIConfig {
     public static final Color EXIT_BG = new Color(50, 0, 0);
     public static final Color EXIT_BG_M = new Color(150, 110, 40, 0);
 
+    public static double scaleFactor = 0.5;
+
+    public static int scale(int baseValue) {
+        return (int) Math.round(baseValue * scaleFactor);
+    }
+
     public static void updateForResolution(int width, int height) { //for some reason i cant look the ratio of thw window so there are 4 presets i calculated with the style exel sheet u can also edit stuff there it should al be linkened together.
+        scaleFactor = width / 1902.0;
+
         if (width >= 951) {
             LEVEL_BTN_SIZE = new Dimension(420, 50);
             ACTION_BTN_SIZE = new Dimension(300, 45);
