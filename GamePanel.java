@@ -182,7 +182,7 @@ public class GamePanel extends JPanel {
         int laneWidth = getWidth() / 4;
         double songTime = audioManager.getCurrentTimeSeconds();
 
-        String[] keyNames = {"Dd", "F", "H", "J"};
+        String[] keyNames = {"D", "F", "H", "J"};
         for (int i = 0; i < 4; i++) { //mabey i will up it to 5 lines instad of 4
             Color laneColor = laneColors[i];
             g2d.setColor(new Color(laneColor.getRed(), laneColor.getGreen(), laneColor.getBlue(), 30));

@@ -337,6 +337,14 @@ public class MenuPanel extends JPanel {
             Main.showMenu();
         });
 
+        JButton convertBtn = new JButton("Convert osu! Level");
+        convertBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        convertBtn.addActionListener(e -> {
+            OsuConverter.openConverterDialog();
+            settingsDialog.dispose();
+            Main.showMenu();
+        });
+
         settingsDialog.add(Box.createVerticalStrut(15));
         settingsDialog.add(nameLabel);
         settingsDialog.add(nameField);
@@ -346,6 +354,8 @@ public class MenuPanel extends JPanel {
         settingsDialog.add(Box.createVerticalStrut(15));
         settingsDialog.add(resLabel);
         settingsDialog.add(resDropdown);
+        settingsDialog.add(Box.createVerticalStrut(20));
+        settingsDialog.add(convertBtn);
         settingsDialog.add(Box.createVerticalStrut(20));
         settingsDialog.add(saveBtn);
 

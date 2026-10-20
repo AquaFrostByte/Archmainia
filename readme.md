@@ -5,7 +5,7 @@ To be honest i didnt even knew that exissted but i thought of the idea and we sh
 Sadly we never made it...
 
 So i already had rought code that i now need to polish up for the first versions.
-I defently want to add an Leaderboard, Custom Levels, Osu converter and since i started playing Eguitar a way to connect ur Guitar to play the game!
+I defently want to add an Leaderboard, Custom Levels, Osu converter (which is curently just a basic concept) and since i started playing Eguitar a way to connect ur Guitar to play the game!
 
 ## Basic gameloop
 
@@ -23,3 +23,8 @@ THere is a https://archmania.lain.onl/manual (Well if i get to it :p)
 ## Song Mentions
 
 The song you hear in the Demo is Duvet by Boa go check them out!
+
+## Modding
+
+Images can be replace to make skins
+And well levels are also duable with a TLDR Osu converter
