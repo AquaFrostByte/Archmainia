@@ -1,3 +1,4 @@
+import java.awt.event.KeyEvent;
 import java.io.*;
 import java.util.HashMap;
 
@@ -10,6 +11,9 @@ public class SaveSystem {
     public int resWidth = 951;
     public int resHeight = 1247;
     public int judgmentY = 1050;
+    public boolean upscroll = false;
+
+    public int[] keyCodes = {KeyEvent.VK_D, KeyEvent.VK_F, KeyEvent.VK_G, KeyEvent.VK_H, KeyEvent.VK_J};
 
     private final String CONFIG_NAME = "config.txt";
 
@@ -82,11 +86,35 @@ public class SaveSystem {
             line = br.readLine();
             if (line != null && !line.isEmpty()) judgmentY = Integer.parseInt(line.trim());
 
+            line = br.readLine();
+            if (line != null && !line.isEmpty()) upscroll = Boolean.parseBoolean(line.trim());
+
+            line = br.readLine();
+            if (line != null && !line.isEmpty()) {
+                String[] parts = line.trim().split(",");
+                if (parts.length == keyCodes.length) {
+                    int[] parsed = new int[parts.length];
+                    for (int i = 0; i < parts.length; i++) parsed[i] = Integer.parseInt(parts[i].trim());
+                    keyCodes = parsed;
+                }
+            }
+
+
+
             System.out.println("Config loaded successfully!");
 
         } catch (Exception e) {
             System.err.println("ERROR READING CONFIG FILE");
         }
+    }
+
+    private String joinKeys() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < keyCodes.length; i++) {
+            if (i > 0) sb.append(",");
+            sb.append(keyCodes[i]);
+        }
+        return sb.toString();
     }
 
     public void saveConfig() {
@@ -96,6 +124,8 @@ public class SaveSystem {
             out.println(resWidth);  
             out.println(resHeight); 
             out.println(judgmentY); 
+            out.println(upscroll);
+            out.println(joinKeys()); 
         } catch (Exception e) {
             System.err.println("Could not save config!");
         }

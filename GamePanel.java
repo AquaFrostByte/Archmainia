@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -27,7 +28,9 @@ public class GamePanel extends JPanel {
 
     private final int SCROLL_SPEED = 400;
     private int JUDGMENT_Y = UIConfig.JUDGMENT_Y;
-    private final Color[] laneColors = {Color.RED, Color.GREEN, Color.CYAN, Color.MAGENTA};
+    private final boolean upscroll = Main.saveSystem.upscroll;
+    private final int LANES = 5;
+    private final Color[] laneColors = {Color.RED, Color.GREEN, Color.YELLOW, Color.CYAN, Color.MAGENTA};
 
     public GamePanel(String levelFile) {
         this.setBackground(Color.BLACK);
@@ -42,7 +45,7 @@ public class GamePanel extends JPanel {
         int btnWidth = UIConfig.ACTION_BTN_SIZE.width;
         int btnHeight = UIConfig.ACTION_BTN_SIZE.height;
 
-        playAgainBtn = new JButton("Retry");
+        playAgainBtn = new ImageButton("Retry");
         playAgainBtn.setBounds(UIConfig.GAME_RETRY_X, UIConfig.GAME_RETRY_Y, btnWidth, btnHeight);
         playAgainBtn.setVisible(false);
         playAgainBtn.setFocusPainted(false);
@@ -52,7 +55,7 @@ public class GamePanel extends JPanel {
         playAgainBtn.addActionListener(e -> startGame(currentLevelFile));
         this.add(playAgainBtn);
 
-        menuBtn = new JButton("Back to Menu");
+        menuBtn = new ImageButton("Back to Menu");
         menuBtn.setBounds(UIConfig.GAME_MENU_X, UIConfig.GAME_MENU_Y, btnWidth, btnHeight);
         menuBtn.setVisible(false);
         menuBtn.setFocusPainted(false);
@@ -65,7 +68,7 @@ public class GamePanel extends JPanel {
         });
         this.add(menuBtn);
 
-        resumeBtn = new JButton("Resume");
+        resumeBtn = new ImageButton("Resume");
         resumeBtn.setBounds(UIConfig.PAUSE_RESUME_X, UIConfig.PAUSE_RESUME_Y, btnWidth, btnHeight);
         resumeBtn.setVisible(false);
         resumeBtn.setFocusPainted(false);
@@ -77,7 +80,7 @@ public class GamePanel extends JPanel {
         resumeBtn.addActionListener(e -> togglePause());
         this.add(resumeBtn);
 
-        pauseMenuBtn = new JButton("Quit to Menu");
+        pauseMenuBtn = new ImageButton("Quit to Menu");
         pauseMenuBtn.setBounds(UIConfig.PAUSE_MENU_X, UIConfig.PAUSE_MENU_Y, btnWidth, btnHeight);
         pauseMenuBtn.setVisible(false);
         pauseMenuBtn.setFocusPainted(false);
@@ -179,11 +182,11 @@ public class GamePanel extends JPanel {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        int laneWidth = getWidth() / 4;
+        int laneWidth = getWidth() / LANES;
         double songTime = audioManager.getCurrentTimeSeconds();
 
-        String[] keyNames = {"D", "F", "H", "J"};
-        for (int i = 0; i < 4; i++) { //mabey i will up it to 5 lines instad of 4
+        int judgY = judgmentY();
+        for (int i = 0; i < LANES; i++) { //mabey i will up it to 5 lines instad of 4
             Color laneColor = laneColors[i];
             g2d.setColor(new Color(laneColor.getRed(), laneColor.getGreen(), laneColor.getBlue(), 30));
             g2d.fillRect(i * laneWidth, 0, laneWidth, getHeight());
@@ -193,12 +196,15 @@ public class GamePanel extends JPanel {
 
             g2d.setColor(laneColor);
             g2d.setFont(new Font("Arial", Font.BOLD, 20));
-            g2d.drawString(keyNames[i], i * laneWidth + (laneWidth/2) - 5, JUDGMENT_Y + 30);
+            String keyName = KeyEvent.getKeyText(Main.saveSystem.keyCodes[i]);
+            int textW = g2d.getFontMetrics().stringWidth(keyName);
+            int labelY = upscroll ? judgY - 12 : judgY + 30;   // labels sit outside the note area
+            g2d.drawString(keyName, i * laneWidth + (laneWidth - textW) / 2, labelY);
         }
 
         g2d.setColor(Color.WHITE);
         g2d.setStroke(new BasicStroke(3));
-        g2d.drawLine(0, JUDGMENT_Y, getWidth(), JUDGMENT_Y);
+        g2d.drawLine(0, judgY, getWidth(), judgY);
 
         g2d.setColor(Color.WHITE);
         g2d.setFont(new Font("Arial", Font.BOLD, 20));
@@ -213,9 +219,16 @@ public class GamePanel extends JPanel {
 
         for (Note note : notes) {
             if (note.active) {
-                int bottomY = JUDGMENT_Y - (int)((note.hitTime - songTime) * SCROLL_SPEED);
+                int offset = (int)((note.hitTime - songTime) * SCROLL_SPEED);
                 int height = (note.duration > 0) ? (int)(note.duration * SCROLL_SPEED) : 30;
-                int topY = bottomY - height;
+                int topY, bottomY;
+                if (upscroll) {
+                    topY = judgY + offset;
+                    bottomY = topY + height;
+                } else {
+                    bottomY = judgY - offset;
+                    topY = bottomY - height;
+                }
 
                 if (bottomY > -50 && topY < getHeight() + 50) {
                     if (note.isBeingHeld) {
@@ -233,12 +246,24 @@ public class GamePanel extends JPanel {
         }
     }
 
+    private int judgmentY() {
+        return upscroll ? getHeight() - JUDGMENT_Y : JUDGMENT_Y;
+    }
+
+    @Override 
+    protected void paintChildren(Graphics g) {
+        if (isPaused) {
+            g.setColor(new Color(0, 0, 0, 170));
+            g.fillRect(0, 0, getWidth(), getHeight());
+        }
+
+        super.paintChildren(g);
+    }
 
     private void setupKeys() {
-        bindKey("D", 0);
-        bindKey("F", 1);
-        bindKey("H", 2);
-        bindKey("J", 3);
+        for (int lane = 0; lane < LANES; lane++) {
+            bindKey(Main.saveSystem.keyCodes[lane], lane);
+        }
         this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("ESCAPE"), "pause");
         this.getActionMap().put("pause", new AbstractAction() {
             @Override
@@ -264,20 +289,20 @@ public class GamePanel extends JPanel {
         }
     }
 
-    private void bindKey(String key, int lane) {
+    private void bindKey(int keyCode, int lane) {
         InputMap inputMap = this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         ActionMap actionMap = this.getActionMap();
 
-        inputMap.put(KeyStroke.getKeyStroke("pressed " + key), key + "Press");
-        actionMap.put(key + "Press", new AbstractAction() {
+        inputMap.put(KeyStroke.getKeyStroke(keyCode, 0, false), "lane" + lane + "Press");
+        actionMap.put("lane" + lane + "Press", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (!isGameOver) checkHitPress(lane);
             }
         });
 
-        inputMap.put(KeyStroke.getKeyStroke("released " + key), key + "Release");
-        actionMap.put(key + "Release", new AbstractAction() {
+        inputMap.put(KeyStroke.getKeyStroke(keyCode, 0, true), "lane" + lane + "Release");
+        actionMap.put("lane" + lane + "Release", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (!isGameOver) checkHitRelease(lane);

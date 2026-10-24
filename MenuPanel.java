@@ -1,10 +1,12 @@
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.net.URI;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
@@ -162,7 +164,7 @@ public class MenuPanel extends JPanel {
                     String levelName = folder.getName();
                     int score = Main.saveSystem.getHighScore(levelName);
                     String grade = Main.saveSystem.getGrade(levelName);
-                    JButton btn = new JButton(levelName + "  |  Best: " + score + " [" + grade + "]");
+                    JButton btn = new ImageButton(levelName + "  |  Best: " + score + " [" + grade + "]");
 
                     btn.setFont(UIConfig.LEVEL_BTN_FONT);
                     btn.setFocusPainted(false);
@@ -182,7 +184,7 @@ public class MenuPanel extends JPanel {
             this.add(warningLabel);
         }
 
-        JButton manualBtn = new JButton("📖 Game Manual");
+        JButton manualBtn = new ImageButton("Game Manual");
         manualBtn.setFont(UIConfig.ACTION_BTN_FONT);
         manualBtn.setFocusPainted(false);
         manualBtn.setContentAreaFilled(false);
@@ -222,7 +224,7 @@ public class MenuPanel extends JPanel {
 
         this.add(exitBtn);
 
-        JButton settingsBtn = new JButton("Settings");
+        JButton settingsBtn = new ImageButton("Settings");
             settingsBtn.setFont(UIConfig.ACTION_BTN_FONT);
             settingsBtn.setFocusPainted(false);
             settingsBtn.setBackground(UIConfig.SETTINGS_BG);
@@ -270,7 +272,7 @@ public class MenuPanel extends JPanel {
 
     private void openSettingsMenu() {
         JDialog settingsDialog = new JDialog(Main.frame, "Settings", true);
-        settingsDialog.setSize(350, 350);
+        settingsDialog.setSize(380, 500);
         settingsDialog.setLocationRelativeTo(this);
         settingsDialog.getContentPane().setBackground(new Color(40, 40, 40));
         settingsDialog.setLayout(new BoxLayout(settingsDialog.getContentPane(), BoxLayout.Y_AXIS));
@@ -313,11 +315,72 @@ public class MenuPanel extends JPanel {
         else if (Main.saveSystem.resWidth == 475) resDropdown.setSelectedIndex(3);
         else resDropdown.setSelectedIndex(0);
 
-        JButton saveBtn = new JButton("Save & Apply Settings");
+        JLabel keysLabel = new JLabel("Keybinds (click one, then press a key):");
+        keysLabel.setForeground(Color.WHITE);
+        keysLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        final int[] newKeys = Main.saveSystem.keyCodes.clone();
+        final JButton[] keyBtns = new JButton[newKeys.length];
+        final int[] capturing = {-1};
+
+        JPanel keysRow = new JPanel(new GridLayout(1, newKeys.length, 6, 0));
+        keysRow.setOpaque(false);
+        keysRow.setMaximumSize(new Dimension(320, 36));
+        keysRow.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        Runnable refreshKeys = () -> {
+            for (int i = 0; i < keyBtns.length; i++) {
+                keyBtns[i].setText(capturing[0] == i ? "..." : KeyEvent.getKeyText(newKeys[i]));
+            }
+        };
+
+        for (int i = 0; i < newKeys.length; i++) {
+            final int lane = i;
+            JButton kb = new JButton();
+            kb.setFocusTraversalKeysEnabled(false);   // lets TAB be bound too
+            kb.setMargin(new Insets(2, 2, 2, 2));
+            kb.addActionListener(e -> {
+                capturing[0] = lane;
+                refreshKeys.run();
+                kb.requestFocusInWindow();
+            });
+            kb.addKeyListener(new KeyAdapter() {
+                @Override
+                public void keyPressed(KeyEvent e) {
+                    if (capturing[0] != lane) return;
+                    e.consume();
+                    int code = e.getKeyCode();
+                    // ESC is reserved for pause, so it just cancels the capture
+                    if (code != KeyEvent.VK_ESCAPE && code != KeyEvent.VK_UNDEFINED) {
+                        for (int j = 0; j < newKeys.length; j++) {
+                            if (j != lane && newKeys[j] == code) newKeys[j] = newKeys[lane];   // swap
+                        }
+                        newKeys[lane] = code;
+                    }
+                    capturing[0] = -1;
+                    refreshKeys.run();
+                }
+            });
+            keyBtns[i] = kb;
+            keysRow.add(kb);
+        }
+        refreshKeys.run();
+
+        JCheckBox upscrollBox = new JCheckBox("Upscroll (judgment line at the top)", Main.saveSystem.upscroll);
+        upscrollBox.setOpaque(false);
+        upscrollBox.setForeground(Color.WHITE);
+        upscrollBox.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+
+        JButton saveBtn = new ImageButton("Save & Apply Settings");
+        saveBtn.setPreferredSize(new Dimension(240, 36));
+        saveBtn.setMaximumSize(new Dimension(240, 36));
         saveBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
         saveBtn.addActionListener(e -> {
             Main.saveSystem.username = nameField.getText();
             Main.saveSystem.volume = volSlider.getValue();
+            Main.saveSystem.upscroll = upscrollBox.isSelected();
+            Main.saveSystem.keyCodes = newKeys.clone();
 
             int selectedRes = resDropdown.getSelectedIndex();
             switch(selectedRes) {
@@ -337,7 +400,9 @@ public class MenuPanel extends JPanel {
             Main.showMenu();
         });
 
-        JButton convertBtn = new JButton("Convert osu! Level");
+        JButton convertBtn = new ImageButton("Convert osu! Level");
+        convertBtn.setPreferredSize(new Dimension(240, 36));
+        convertBtn.setMaximumSize(new Dimension(240, 36));
         convertBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
         convertBtn.addActionListener(e -> {
             OsuConverter.openConverterDialog();
@@ -354,6 +419,12 @@ public class MenuPanel extends JPanel {
         settingsDialog.add(Box.createVerticalStrut(15));
         settingsDialog.add(resLabel);
         settingsDialog.add(resDropdown);
+        settingsDialog.add(Box.createVerticalStrut(15));
+        settingsDialog.add(keysLabel);
+        settingsDialog.add(Box.createVerticalStrut(5));
+        settingsDialog.add(keysRow);
+        settingsDialog.add(Box.createVerticalStrut(10));
+        settingsDialog.add(upscrollBox);
         settingsDialog.add(Box.createVerticalStrut(20));
         settingsDialog.add(convertBtn);
         settingsDialog.add(Box.createVerticalStrut(20));
