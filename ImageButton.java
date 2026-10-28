@@ -1,6 +1,5 @@
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
@@ -8,11 +7,11 @@ import javax.swing.*;
 
 public class ImageButton extends JButton {
     private static final  String IMAGE_PATH = "img/button.png";
-    private static final  int CAP = 30;
 
     private static final Color HOVER_TEXT = new Color(120, 220, 225);
 
     private static BufferedImage source;
+    private static int capSrc = 1;
     private static boolean triedLoading = false;
 
     private static BufferedImage source() {
@@ -20,6 +19,7 @@ public class ImageButton extends JButton {
             triedLoading = true;
             try {
                 source = ImageIO.read(new File(IMAGE_PATH));
+                if (source != null) capSrc = detectCap(source);
             } catch (IOException e) {
                 System.err.println("Could not load" + IMAGE_PATH + ": " + e.getMessage());
             }
@@ -27,6 +27,22 @@ public class ImageButton extends JButton {
         return source;
     }
 
+    private static int detectCap(BufferedImage img) {
+        int w = img.getWidth(), last = img.getHeight() - 1;
+        int topMin = -1, topMax = -1, botMin = -1, botMax = -1;
+        for (int x = 0; x < w; x++) {
+            if (alpha(img, x, 0) > 128)    { if (topMin < 0) topMin = x; topMax = x; }
+            if (alpha(img, x, last) > 128) { if (botMin < 0) botMin = x; botMax = x; }
+        }
+
+        if (topMin < 0 || botMin < 0) return 1;
+        int slant = Math.max(Math.abs(botMin - topMin), Math.abs(botMax - topMax));
+        return Math.max(1, Math.min(slant + 1, w / 2));
+    }
+
+    private static int alpha(BufferedImage img, int x, int y) {
+        return (img.getRGB(x, y) >>> 24) & 0xFF;
+    }
 
     public ImageButton(String text) {
         super(text);
@@ -55,10 +71,25 @@ public class ImageButton extends JButton {
             int cap = 10;
             if (src != null) {
                 int sw = src.getWidth(), sh = src.getHeight();
-                cap = Math.min(w /2, (int) Math.round(CAP * h / (double) sh));
-                g2.drawImage(src, cap, 0, w - cap, h, CAP, 0, sw - CAP, sh, null);
-                g2.drawImage(src, 0, 0, cap, h, 0, 0, CAP, sh, null);
-                g2.drawImage(src, w - cap, 0, w, h, sw - CAP, 0, sw, sh, null); 
+                int y0 = 0, drawH = h;
+
+                if (h >= sh * 2) {                                        // pixel art
+                    int scale = Math.max(1, Math.min(Math.round(h / (float) sh), w / (2 * capSrc)));
+                    drawH = sh * scale;
+                    y0 = (h - drawH) / 2;
+                    cap = capSrc * scale;
+                    g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                            RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+                } else {                                                  // high-res art
+                    cap = Math.min(w / 2, (int) Math.round(capSrc * h / (double) sh));
+                    g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                            RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+                    g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                }
+
+                g2.drawImage(src, cap, y0, w - cap, y0 + drawH, capSrc, 0, sw - capSrc, sh, null);  
+                g2.drawImage(src, 0, y0, cap, y0 + drawH, 0, 0, capSrc, sh, null);                  
+                g2.drawImage(src, w - cap, y0, w, y0 + drawH, sw - capSrc, 0, sw, sh, null);  
             } else {
                 g2.setColor(getBackground());
 

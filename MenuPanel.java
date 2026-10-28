@@ -26,7 +26,11 @@ public class MenuPanel extends JPanel {
             h = Math.max(targetH, h / 2);
             BufferedImage tmp = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g2 = tmp.createGraphics();
-            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+            boolean pixelArt = targetW >= w * 2 || targetH >= h * 2;
+            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, pixelArt
+                ? RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR
+                : RenderingHints.VALUE_INTERPOLATION_BICUBIC
+            );
             g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
             g2.drawImage(current, 0, 0, w, h, null);
             g2.dispose();
