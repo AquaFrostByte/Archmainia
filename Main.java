@@ -8,6 +8,7 @@ public class Main {
     public static void main(String[] args) {
 
         saveSystem = new SaveSystem();
+        SkinManager.setActive(saveSystem.skin);
 
         frame = new JFrame("Arch Rhythm Hero"); //if u want to make any kind of mots for Archmaina or as i like to call it in prod Arch Rythem Hero do so here :3
         frame.setSize(saveSystem.resWidth, saveSystem.resHeight);

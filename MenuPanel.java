@@ -76,7 +76,7 @@ public class MenuPanel extends JPanel {
             int w = (int) Math.round(designWidth * f);
             this.hoverLimit = (int) Math.round(30 * f);
             try {
-                BufferedImage src = ImageIO.read(new File(imagePath));
+                BufferedImage src = ImageIO.read(SkinManager.resolve(imagePath));
                 int h = (int) Math.round(w * (double) src.getHeight() / src.getWidth());
 
                 image = rotate(scaleImage(src, w, h), tiltDegrees);
@@ -114,7 +114,7 @@ public class MenuPanel extends JPanel {
     public MenuPanel() {
 
         try {
-            backgroundImage = scaleImage(ImageIO.read(new File("img/background.png")),
+            backgroundImage = scaleImage(ImageIO.read(SkinManager.resolve("background.png")),
                     Main.saveSystem.resWidth, Main.saveSystem.resHeight);
         } catch (IOException e) {
             System.err.println("Could not load background: " + e.getMessage());
@@ -122,10 +122,10 @@ public class MenuPanel extends JPanel {
 
         floaters = new ArrayList<>();
 
-        floaters.add(new FloatingElement("img/cgirl.png", 842, 2196, 1689,   0));
-        floaters.add(new FloatingElement("img/duke1.png", 440,  711,  479, -24));
-        floaters.add(new FloatingElement("img/duke2.png", 1598, 661,  575,   8));
-        floaters.add(new FloatingElement("img/duke3.png", 1680, 1134, 466,   0));
+        floaters.add(new FloatingElement("cgirl.png", 842, 2196, 1689,   0));
+        floaters.add(new FloatingElement("duke1.png", 440,  711,  479, -24));
+        floaters.add(new FloatingElement("duke2.png", 1598, 661,  575,   8));
+        floaters.add(new FloatingElement("duke3.png", 1680, 1134, 466,   0));
 
         floaters.get(1).direction = -1;
         floaters.get(3).direction = -1;
@@ -370,6 +370,35 @@ public class MenuPanel extends JPanel {
         }
         refreshKeys.run();
 
+        JLabel skinLabel = new JLabel("Skin:");
+        skinLabel.setForeground(Color.WHITE);
+        skinLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JComboBox<String> skinDropdown = new JComboBox<>(SkinManager.listSkins().toArray(new String[0]));
+        skinDropdown.setMaximumSize(new Dimension(200, 30));
+        skinDropdown.setAlignmentX(Component.CENTER_ALIGNMENT);
+        skinDropdown.setSelectedItem(Main.saveSystem.skin);
+
+        JButton installSkinBtn = new JButton("Install skin (.ams)...");
+        installSkinBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        installSkinBtn.addActionListener(e -> {
+            JFileChooser fc = new JFileChooser();
+            fc.setDialogTitle("Select a skin (.ams)");
+            fc.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Arch skins (*.ams)", "ams"));
+            if (fc.showOpenDialog(settingsDialog) == JFileChooser.APPROVE_OPTION) {
+                try {
+                    String installed = SkinManager.install(fc.getSelectedFile());
+                    skinDropdown.setModel(new DefaultComboBoxModel<>(SkinManager.listSkins().toArray(new String[0])));
+                    skinDropdown.setSelectedItem(installed);
+                    JOptionPane.showMessageDialog(settingsDialog,
+                            "Installed skin: " + installed + "\nPress \"Save & Apply Settings\" to use it.");
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(settingsDialog, "Could not install skin: " + ex.getMessage(),
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
         JCheckBox upscrollBox = new JCheckBox("Upscroll (judgment line at the top)", Main.saveSystem.upscroll);
         upscrollBox.setOpaque(false);
         upscrollBox.setForeground(Color.WHITE);
@@ -385,6 +414,10 @@ public class MenuPanel extends JPanel {
             Main.saveSystem.volume = volSlider.getValue();
             Main.saveSystem.upscroll = upscrollBox.isSelected();
             Main.saveSystem.keyCodes = newKeys.clone();
+
+            String chosenSkin = (String) skinDropdown.getSelectedItem();
+            Main.saveSystem.skin = chosenSkin != null ? chosenSkin : SkinManager.DEFAULT_NAME;
+            SkinManager.setActive(Main.saveSystem.skin);
 
             int selectedRes = resDropdown.getSelectedIndex();
             switch(selectedRes) {
@@ -427,6 +460,11 @@ public class MenuPanel extends JPanel {
         settingsDialog.add(keysLabel);
         settingsDialog.add(Box.createVerticalStrut(5));
         settingsDialog.add(keysRow);
+        settingsDialog.add(Box.createVerticalStrut(15));
+        settingsDialog.add(skinLabel);
+        settingsDialog.add(skinDropdown);
+        settingsDialog.add(Box.createVerticalStrut(5));
+        settingsDialog.add(installSkinBtn);
         settingsDialog.add(Box.createVerticalStrut(10));
         settingsDialog.add(upscrollBox);
         settingsDialog.add(Box.createVerticalStrut(20));

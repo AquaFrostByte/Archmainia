@@ -6,22 +6,27 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 
 public class ImageButton extends JButton {
-    private static final  String IMAGE_PATH = "img/button.png";
-
     private static final Color HOVER_TEXT = new Color(120, 220, 225);
 
     private static BufferedImage source;
     private static int capSrc = 1;
     private static boolean triedLoading = false;
 
+    public static void reload(){
+        triedLoading = false;
+        source = null;
+        capSrc = 1;
+    }
+
     private static BufferedImage source() {
         if(!triedLoading) {
             triedLoading = true;
+            File f = SkinManager.resolve("button.png");
             try {
-                source = ImageIO.read(new File(IMAGE_PATH));
+                source = ImageIO.read(f);
                 if (source != null) capSrc = detectCap(source);
             } catch (IOException e) {
-                System.err.println("Could not load" + IMAGE_PATH + ": " + e.getMessage());
+                System.err.println("Could not load" + f.getPath() + ": " + e.getMessage());
             }
         }
         return source;

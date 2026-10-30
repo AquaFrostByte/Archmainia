@@ -12,6 +12,7 @@ public class SaveSystem {
     public int resHeight = 1247;
     public int judgmentY = 1050;
     public boolean upscroll = false;
+    public String skin = "Default";
 
     public int[] keyCodes = {KeyEvent.VK_D, KeyEvent.VK_F, KeyEvent.VK_G, KeyEvent.VK_H, KeyEvent.VK_J};
 
@@ -99,7 +100,8 @@ public class SaveSystem {
                 }
             }
 
-
+            line = br.readLine();
+            if (line != null && !line.isEmpty()) skin = line.trim();
 
             System.out.println("Config loaded successfully!");
 
@@ -125,6 +127,7 @@ public class SaveSystem {
             out.println(resHeight); 
             out.println(judgmentY); 
             out.println(upscroll);
+            out.println(skin);
             out.println(joinKeys()); 
         } catch (Exception e) {
             System.err.println("Could not save config!");
