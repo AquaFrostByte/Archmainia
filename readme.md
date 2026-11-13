@@ -12,6 +12,12 @@ Stuff in the new version:
 
 A simple rhythm game loop, like in osu!mania or Fortnite Festival, but in Java!! (which probably makes it worse x33)
 
+Little gameplay from my talented friend X3:
+
+
+https://github.com/user-attachments/assets/12796657-fc43-4eb4-a873-e663c55e7795
+
+
 ## Running the game
 
 Download the latest version from the [Releases page](https://github.com/AquaFrostByte/Archmainia/releases). Java is included.
