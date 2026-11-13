@@ -1,0 +1,26 @@
+name: Build Windows
+on: [workflow_dispatch, push]
+jobs:
+  win:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Build
+        run: |
+          mkdir -p out input
+          javac -d out *.java
+          jar cfm ArchMania.jar Manifest.txt -C out .
+          cp ArchMania.jar input/
+          jpackage --type app-image --name ArchMania --input input --main-jar ArchMania.jar --main-class Main --add-modules java.base,java.desktop,java.logging --dest dist
+          cp -r img levels Skins Style config.txt dist/ArchMania/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ArchMania-windows
+          path: dist/ArchMania
