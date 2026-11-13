@@ -1,30 +1,35 @@
-# Archmania
+#  Archmania
 
-Archmaina is a little rythemgame like Osu! Mania.
-To be honest i didnt even knew that exissted but i thought of the idea and we should make a java project in cs class.
-Sadly we never made it...
+Archmania is a little rhythm game like osu!mania, written in Java.
 
-So i already had rought code that i now need to polish up for the first versions.
-I defently want to add an Leaderboard, Custom Levels, Osu converter (which is curently just a basic concept which is a bit broken and therfore dosent work correctly sometimes.) and since i started playing Eguitar a way to connect ur Guitar to play the game!
+To be honest, I didn't even know osu!mania existed when I came up with the idea. We were supposed to make a Java project in CS class, and sadly we never did. So I already had some rough code that I'm now polishing up for the first versions.
 
-## Basic gameloop
+Stuff in the new version:
+- custom levels
+- a better osu! converter (right now it's just a basic concept and a bit broken, so it doesn't always work correctly)
 
-The game loop is mainly a simple rythem game that also has been seen in Osu! Mania or Fortnite festival but mine is in java!! (which makes it worse probably x33)
+## Gameplay
+
+A simple rhythm game loop, like in osu!mania or Fortnite Festival, but in Java!! (which probably makes it worse x33)
 
 ## Running the game
 
-to run the game just do 
-``` bash
-java Main.java
+Download the latest version from the [Releases page](https://github.com/AquaFrostByte/Archmainia/releases). Java is included.
+
+Or run it from source:
+
+```bash
+javac -d out *.java
+java -cp out Main
 ```
 
-THere is a https://archmania.lain.onl/manual (Well if i get to it :p)
-
-## Song Mentions
-
-The song you hear in the Demo is Duvet by Boa go check them out!
+There will be a manual at https://archmania.lain.onl/manual (if I get to it :p)
 
 ## Modding
 
-Images can be replace to make skins
-And well levels are also duable with a TLDR Osu converter
+Images can be replaced to make skins, and levels are doable too with the osu! converter.
+
+## Songs/Levels
+
+The Linux Version dosent come Bundled with them!!
+I picked quite hard levels but u can always just import easyer onces.
