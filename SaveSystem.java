@@ -88,8 +88,8 @@ public class SaveSystem {
             if (line != null && !line.isEmpty()) judgmentY = Integer.parseInt(line.trim());
 
             line = br.readLine();
-            if (line != null && !line.isEmpty()) upscroll = Boolean.parseBoolean(line.trim());
-
+            if (line != null && !line.isEmpty()) skin = line.trim();
+                    
             line = br.readLine();
             if (line != null && !line.isEmpty()) {
                 String[] parts = line.trim().split(",");
@@ -99,7 +99,6 @@ public class SaveSystem {
                     keyCodes = parsed;
                 }
             }
-
             line = br.readLine();
             if (line != null && !line.isEmpty()) skin = line.trim();
 

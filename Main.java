@@ -26,6 +26,8 @@ public class Main {
         frame.setBackground(new Color(0, 0, 0, 0));
         frame.getContentPane().setBackground(new Color(0, 0, 0, 0));
 
+        SkinManager.setActive(saveSystem.skin);
+
         frame.getRootPane().setDoubleBuffered(false);
 
 
