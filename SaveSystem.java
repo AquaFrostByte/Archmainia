@@ -75,25 +75,28 @@ public class SaveSystem {
 
         try (BufferedReader br = new BufferedReader(new FileReader(configFile))) {
             String line;
-            
+        
             line = br.readLine();
             if (line != null && !line.isEmpty()) username = line.trim();
-
+        
             line = br.readLine();
             if (line != null && !line.isEmpty()) volume = Integer.parseInt(line.trim());
-
+        
             line = br.readLine();
             if (line != null && !line.isEmpty()) resWidth = Integer.parseInt(line.trim());
-
+        
             line = br.readLine();
             if (line != null && !line.isEmpty()) resHeight = Integer.parseInt(line.trim());
-
+        
             line = br.readLine();
             if (line != null && !line.isEmpty()) judgmentY = Integer.parseInt(line.trim());
-
+        
+            line = br.readLine();
+            if (line != null && !line.isEmpty()) upscroll = Boolean.parseBoolean(line.trim());
+        
             line = br.readLine();
             if (line != null && !line.isEmpty()) skin = line.trim();
-                    
+        
             line = br.readLine();
             if (line != null && !line.isEmpty()) {
                 String[] parts = line.trim().split(",");
@@ -103,11 +106,8 @@ public class SaveSystem {
                     keyCodes = parsed;
                 }
             }
-            line = br.readLine();
-            if (line != null && !line.isEmpty()) skin = line.trim();
-
+        
             System.out.println("Config loaded successfully!");
-
         } catch (Exception e) {
             System.err.println("ERROR READING CONFIG FILE");
         }

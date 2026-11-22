@@ -217,8 +217,7 @@ public class MenuPanel extends JPanel {
         if (!levelsDir.exists()) levelsDir.mkdir();
 
         listTop = UIConfig.MENU_LEVEL_START_Y;
-        listBottem = Math.min(UIConfig.MENU_MANUAL_Y,
-                Math.min(UIConfig.MENU_SETTINGS_Y, UIConfig.MENU_EXIT_Y)) - 30;
+        listBottem = Math.min(UIConfig.MENU_MANUAL_Y, UIConfig.MENU_SETTINGS_Y) - 30;
 
         File[] folders = levelsDir.listFiles(File::isDirectory);
         if (folders != null) {

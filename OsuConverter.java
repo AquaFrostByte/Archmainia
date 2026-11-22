@@ -90,7 +90,7 @@ public class OsuConverter {
         }
         notes.sort(Comparator.comparingDouble(a -> a[0]));
 
-        File levelFolder = new File("Levels/" + title);
+        File levelFolder = new File("levels/" + title);
         levelFolder.mkdirs();
 
         File audioIn = new File(sourceDir, audioFilename);
@@ -162,7 +162,7 @@ public class OsuConverter {
     }
 
     public static void handleOszFile(File oszFile) {
-        File tempDir = new File("Levels/temp_osz");
+        File tempDir = new File("levels/temp_osz");
         try {
             List<File> osuFiles = extractOsz(oszFile, tempDir);
 
