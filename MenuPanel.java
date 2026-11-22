@@ -6,16 +6,75 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
 public class MenuPanel extends JPanel {
 
+    private final List<JButton> levelButtons = new ArrayList<>();
+    private final JLabel scrollHint = new JLabel("", SwingConstants.CENTER);
+    private int scrollIndex = 0;
+    private int listTop, listBottem;
+
     private BufferedImage backgroundImage;
     private List<FloatingElement> floaters;
     private Timer animationTimer;
     private BufferedImage frameBuffer;
+
+    private int visibleCount() {
+        return Math.max(1, (listBottem - listTop) / UIConfig.MENU_LEVEL_SPACING);
+    }
+
+    private void scrollBy(int notches) {
+        int maxIndex = Math.max(0, levelButtons.size() - visibleCount());
+        scrollIndex = Math.max(0, Math.min(maxIndex, scrollIndex + notches));
+        layoutLevels();
+    }
+
+    private void layoutLevels() {
+        int visible = visibleCount();
+        for (int i = 0; i < levelButtons.size(); i++) {
+            JButton b = levelButtons.get(i);
+            boolean show = i >= scrollIndex && i < scrollIndex + visible;
+            b.setVisible(show);
+            if (show) {
+                b.setBounds(UIConfig.MENU_LEVEL_START_X,
+                    listTop + (i - scrollIndex) * UIConfig.MENU_LEVEL_SPACING,
+                    UIConfig.LEVEL_BTN_SIZE.width, UIConfig.LEVEL_BTN_SIZE.height);
+            }
+        }
+
+        int total = levelButtons.size();
+        if (total > visible) {
+            int last = Math.min(total, scrollIndex + visible);
+            scrollHint.setText("Scroll for more  (" + (scrollIndex + 1) + "-" + last + " of " + total
+                            + ")  |  Right-click a level to delete");
+        }   else if (total > 0) {
+            scrollHint.setText("Right-click a level to delete :3");
+        }   else {
+            scrollHint.setText("");
+        }
+    }
+
+    private void deleteLevel(File folder) {
+        int choice = JOptionPane.showConfirmDialog(this,
+                "Delete \"" + folder.getName() + "\" permanently?\nThis removes the level folder and its score.",
+                "Delete level", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        if (choice != JOptionPane.YES_OPTION) return;
+
+        deleteRecursively(folder);
+        Main.saveSystem.removeScore(folder.getName());
+        Main.showMenu();  
+    }
+
+    private static void deleteRecursively(File f) {
+        File[] kids = f.listFiles();
+        if (kids != null) for (File k : kids) deleteRecursively(k);
+        f.delete();
+    }
 
     private static BufferedImage scaleImage(BufferedImage src, int targetW, int targetH) {
         if (src == null || targetW <= 0 || targetH <= 0) return src;
@@ -154,39 +213,52 @@ public class MenuPanel extends JPanel {
         title.setBounds(0, UIConfig.MENU_TITLE_Y, Main.saveSystem.resWidth, 50);
         this.add(title);
 
-        File levelsDir = new File("Levels");
+        File levelsDir = new File("levels");
         if (!levelsDir.exists()) levelsDir.mkdir();
 
-        File[] folders = levelsDir.listFiles();
-        int levelCount = 0;
-        int currentLevelY = UIConfig.MENU_LEVEL_START_Y;
+        listTop = UIConfig.MENU_LEVEL_START_Y;
+        listBottem = Math.min(UIConfig.MENU_MANUAL_Y,
+                Math.min(UIConfig.MENU_SETTINGS_Y, UIConfig.MENU_EXIT_Y)) - 30;
 
+        File[] folders = levelsDir.listFiles(File::isDirectory);
         if (folders != null) {
+            Arrays.sort(folders, Comparator.comparing(f -> f.getName().toLowerCase()));
             for (File folder : folders) {
-                if (folder.isDirectory()) {
-                    levelCount++;
-                    String levelName = folder.getName();
-                    int score = Main.saveSystem.getHighScore(levelName);
-                    String grade = Main.saveSystem.getGrade(levelName);
-                    JButton btn = new ImageButton(levelName + "  |  Best: " + score + " [" + grade + "]");
+                String levelName = folder.getName();
+                int score = Main.saveSystem.getHighScore(levelName);
+                String grade = Main.saveSystem.getGrade(levelName);
+                JButton btn = new ImageButton(levelName + "  |  Best: " + score + " [" + grade + "]");
 
-                    btn.setFont(UIConfig.LEVEL_BTN_FONT);
-                    btn.setFocusPainted(false);
-                    btn.setBounds(UIConfig.MENU_LEVEL_START_X, currentLevelY, UIConfig.LEVEL_BTN_SIZE.width, UIConfig.LEVEL_BTN_SIZE.height);
-                    btn.addActionListener(e -> Main.playGame(folder.getPath()));
-                    this.add(btn);
-                    currentLevelY += UIConfig.MENU_LEVEL_SPACING;
-                }
+                btn.setFont(UIConfig.LEVEL_BTN_FONT);
+                btn.setFocusPainted(false);
+                btn.addActionListener(e -> Main.playGame(folder.getPath()));
+
+                JPopupMenu menu = new JPopupMenu();
+                JMenuItem del = new JMenuItem("Delete level");
+                del.addActionListener(e -> deleteLevel(folder));
+                menu.add(del);
+                btn.setComponentPopupMenu(menu);
+
+                levelButtons.add(btn);
+                this.add(btn);
             }
         }
 
-        if (levelCount == 0) {
+        if (levelButtons.isEmpty()) {
             JLabel warningLabel = new JLabel("No levels found!", SwingConstants.CENTER);
             warningLabel.setFont(new Font("Arial", Font.BOLD, 22));
             warningLabel.setForeground(Color.RED);
             warningLabel.setBounds(0, UIConfig.MENU_LEVEL_START_Y, Main.saveSystem.resWidth, 50);
             this.add(warningLabel);
         }
+
+        scrollHint.setFont(new Font("Arial", Font.PLAIN, 14));
+        scrollHint.setForeground(UIConfig.TEXT_LIGHT);
+        scrollHint.setBounds(0, listBottem + 5, Main.saveSystem.resWidth, 20);
+        this.add(scrollHint);
+
+        addMouseWheelListener(e -> scrollBy(e.getWheelRotation()));
+        layoutLevels();
 
         JButton manualBtn = new ImageButton("Game Manual");
         manualBtn.setFont(UIConfig.ACTION_BTN_FONT);

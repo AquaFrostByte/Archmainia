@@ -23,6 +23,10 @@ public class SaveSystem {
         loadConfig();
     }
 
+    public void removeScore(String level) {
+        if (levelRecords.remove(level) != null) saveScoresToFile();
+    }
+
     public void loadScores() {
         try (BufferedReader br = new BufferedReader(new FileReader(FILE_NAME))) {
             String line;

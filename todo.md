@@ -1,5 +1,5 @@
-Add Real lavels 
-Fix button glitching
 Add the Manual
 
-
+Add 4 line mode!!!
+add restart buiton 
+Guitar
